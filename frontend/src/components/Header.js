@@ -1,6 +1,6 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import logo from "../imgs/topbar_logo.png";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import logo from '../imgs/topbar_logo.png';
 
 const LoggedOutView = () => {
   return (
@@ -10,6 +10,7 @@ const LoggedOutView = () => {
           Sign in
         </Link>
       </li>
+
       <li className="nav-item">
         <Link to="/register" className="nav-link">
           Sign up
@@ -27,6 +28,7 @@ const LoggedInView = (props) => {
           <i className="ion-compose"></i>&nbsp;New Item
         </Link>
       </li>
+
       <li className="nav-item">
         <Link to="/settings" className="nav-link">
           <i className="ion-gear-a"></i>&nbsp;Settings
@@ -48,21 +50,21 @@ const LoggedInView = (props) => {
 };
 
 const Header = (props) => {
-    return (
-      <nav
-        className="navbar navbar-expand-md navbar-dark"
-        style={{ padding: "0.5rem 2rem" }}
-      >
-        <Link to="/" className="navbar-brand">
-          <img alt="logo" src={logo} />
-        </Link>
-        {props.currentUser ? (
-          <LoggedInView currentUser={props.currentUser} />
-        ) : (
-          <LoggedOutView currentUser={props.currentUser} />
-        )}
-      </nav>
-    );
-}
+  return (
+    <nav
+      className="navbar navbar-expand-md navbar-dark"
+      style={{ padding: '0.5rem 2rem' }}
+    >
+      <Link to="/" className="navbar-brand">
+        <img alt="logo" src={logo} />
+      </Link>
+      {props.currentUser ? (
+        <LoggedInView currentUser={props.currentUser} />
+      ) : (
+        <LoggedOutView currentUser={props.currentUser} />
+      )}
+    </nav>
+  );
+};
 
 export default Header;
