@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import logo from '../imgs/topbar_logo.png';
+import React from "react";
+import { Link } from "react-router-dom";
+import logo from "../imgs/topbar_logo.png";
 
 const LoggedOutView = () => {
   return (
@@ -50,7 +50,7 @@ const Header = (props) => {
   return (
     <nav
       className="navbar navbar-expand-md navbar-dark"
-      style={{ padding: '0.5rem 2rem' }}
+      style={{ padding: "0.5rem 2rem" }}
     >
       <Link to="/" className="navbar-brand">
         <img alt="logo" src={logo} />
