@@ -1,15 +1,15 @@
-var router = require("express").Router();
-var mongoose = require("mongoose");
-var Item = mongoose.model("Item");
-var Comment = mongoose.model("Comment");
-var User = mongoose.model("User");
-var auth = require("../auth");
-const { sendEvent } = require("../../lib/event");
+var router = require('express').Router();
+var mongoose = require('mongoose');
+var Item = mongoose.model('Item');
+var Comment = mongoose.model('Comment');
+var User = mongoose.model('User');
+var auth = require('../auth');
+const { sendEvent } = require('../../lib/event');
 
 // Preload item objects on routes with ':item'
-router.param("item", function (req, res, next, slug) {
+router.param('item', function (req, res, next, slug) {
   Item.findOne({ slug: slug })
-    .populate("seller")
+    .populate('seller')
     .then(function (item) {
       if (!item) {
         return res.sendStatus(404);
@@ -22,7 +22,7 @@ router.param("item", function (req, res, next, slug) {
     .catch(next);
 });
 
-router.param("comment", function (req, res, next, id) {
+router.param('comment', function (req, res, next, id) {
   Comment.findById(id)
     .then(function (comment) {
       if (!comment) {
@@ -36,25 +36,25 @@ router.param("comment", function (req, res, next, id) {
     .catch(next);
 });
 
-router.get("/", auth.optional, function (req, res, next) {
+router.get('/', auth.optional, function (req, res, next) {
   var query = {};
   var limit = 100;
   var offset = 0;
 
-  if (typeof req.query.limit !== "undefined") {
+  if (typeof req.query.limit !== 'undefined') {
     limit = req.query.limit;
   }
 
-  if (typeof req.query.offset !== "undefined") {
+  if (typeof req.query.offset !== 'undefined') {
     offset = req.query.offset;
   }
 
-  if (typeof req.query.tag !== "undefined") {
+  if (typeof req.query.tag !== 'undefined') {
     query.tagList = { $in: [req.query.tag] };
   }
 
-  if (typeof req.query.title !== "undefined") {
-    const regex = new RegExp(req.query.title, "r");
+  if (typeof req.query.title !== 'undefined') {
+    const regex = new RegExp(req.query.title, 'i');
     query.title = { $regex: regex };
   }
 
@@ -82,7 +82,7 @@ router.get("/", auth.optional, function (req, res, next) {
         Item.find(query)
           .limit(Number(limit))
           .skip(Number(offset))
-          .sort({ createdAt: "desc" })
+          .sort({ createdAt: 'desc' })
           .exec(),
         Item.count(query).exec(),
         req.payload ? User.findById(req.payload.id) : null,
@@ -104,15 +104,15 @@ router.get("/", auth.optional, function (req, res, next) {
     .catch(next);
 });
 
-router.get("/feed", auth.required, function (req, res, next) {
+router.get('/feed', auth.required, function (req, res, next) {
   var limit = 20;
   var offset = 0;
 
-  if (typeof req.query.limit !== "undefined") {
+  if (typeof req.query.limit !== 'undefined') {
     limit = req.query.limit;
   }
 
-  if (typeof req.query.offset !== "undefined") {
+  if (typeof req.query.offset !== 'undefined') {
     offset = req.query.offset;
   }
 
@@ -125,7 +125,7 @@ router.get("/feed", auth.required, function (req, res, next) {
       Item.find({ seller: { $in: user.following } })
         .limit(Number(limit))
         .skip(Number(offset))
-        .populate("seller")
+        .populate('seller')
         .exec(),
       Item.count({ seller: { $in: user.following } }),
     ])
@@ -144,7 +144,7 @@ router.get("/feed", auth.required, function (req, res, next) {
   });
 });
 
-router.post("/", auth.required, function (req, res, next) {
+router.post('/', auth.required, function (req, res, next) {
   User.findById(req.payload.id)
     .then(function (user) {
       if (!user) {
@@ -156,7 +156,7 @@ router.post("/", auth.required, function (req, res, next) {
       item.seller = user;
 
       return item.save().then(function () {
-        sendEvent("item_created", { item: req.body.item });
+        sendEvent('item_created', { item: req.body.item });
         return res.json({ item: item.toJSONFor(user) });
       });
     })
@@ -164,10 +164,10 @@ router.post("/", auth.required, function (req, res, next) {
 });
 
 // return a item
-router.get("/:item", auth.optional, function (req, res, next) {
+router.get('/:item', auth.optional, function (req, res, next) {
   Promise.all([
     req.payload ? User.findById(req.payload.id) : null,
-    req.item.populate("seller").execPopulate(),
+    req.item.populate('seller').execPopulate(),
   ])
     .then(function (results) {
       var user = results[0];
@@ -178,22 +178,22 @@ router.get("/:item", auth.optional, function (req, res, next) {
 });
 
 // update item
-router.put("/:item", auth.required, function (req, res, next) {
+router.put('/:item', auth.required, function (req, res, next) {
   User.findById(req.payload.id).then(function (user) {
     if (req.item.seller._id.toString() === req.payload.id.toString()) {
-      if (typeof req.body.item.title !== "undefined") {
+      if (typeof req.body.item.title !== 'undefined') {
         req.item.title = req.body.item.title;
       }
 
-      if (typeof req.body.item.description !== "undefined") {
+      if (typeof req.body.item.description !== 'undefined') {
         req.item.description = req.body.item.description;
       }
 
-      if (typeof req.body.item.image !== "undefined") {
+      if (typeof req.body.item.image !== 'undefined') {
         req.item.image = req.body.item.image;
       }
 
-      if (typeof req.body.item.tagList !== "undefined") {
+      if (typeof req.body.item.tagList !== 'undefined') {
         req.item.tagList = req.body.item.tagList;
       }
 
@@ -210,7 +210,7 @@ router.put("/:item", auth.required, function (req, res, next) {
 });
 
 // delete item
-router.delete("/:item", auth.required, function (req, res, next) {
+router.delete('/:item', auth.required, function (req, res, next) {
   User.findById(req.payload.id)
     .then(function (user) {
       if (!user) {
@@ -229,7 +229,7 @@ router.delete("/:item", auth.required, function (req, res, next) {
 });
 
 // Favorite an item
-router.post("/:item/favorite", auth.required, function (req, res, next) {
+router.post('/:item/favorite', auth.required, function (req, res, next) {
   var itemId = req.item._id;
 
   User.findById(req.payload.id)
@@ -248,7 +248,7 @@ router.post("/:item/favorite", auth.required, function (req, res, next) {
 });
 
 // Unfavorite an item
-router.delete("/:item/favorite", auth.required, function (req, res, next) {
+router.delete('/:item/favorite', auth.required, function (req, res, next) {
   var itemId = req.item._id;
 
   User.findById(req.payload.id)
@@ -267,18 +267,18 @@ router.delete("/:item/favorite", auth.required, function (req, res, next) {
 });
 
 // return an item's comments
-router.get("/:item/comments", auth.optional, function (req, res, next) {
+router.get('/:item/comments', auth.optional, function (req, res, next) {
   Promise.resolve(req.payload ? User.findById(req.payload.id) : null)
     .then(function (user) {
       return req.item
         .populate({
-          path: "comments",
+          path: 'comments',
           populate: {
-            path: "seller",
+            path: 'seller',
           },
           options: {
             sort: {
-              createdAt: "desc",
+              createdAt: 'desc',
             },
           },
         })
@@ -295,7 +295,7 @@ router.get("/:item/comments", auth.optional, function (req, res, next) {
 });
 
 // create a new comment
-router.post("/:item/comments", auth.required, function (req, res, next) {
+router.post('/:item/comments', auth.required, function (req, res, next) {
   User.findById(req.payload.id)
     .then(function (user) {
       if (!user) {
@@ -318,7 +318,7 @@ router.post("/:item/comments", auth.required, function (req, res, next) {
 });
 
 router.delete(
-  "/:item/comments/:comment",
+  '/:item/comments/:comment',
   auth.required,
   function (req, res, next) {
     if (req.comment.seller.toString() === req.payload.id.toString()) {
