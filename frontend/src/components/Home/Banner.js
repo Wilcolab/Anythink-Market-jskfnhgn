@@ -22,7 +22,7 @@ const Banner = (props) => {
               style={{ width: "250px" }}
               type="text"
               placeholder="What is it that you truly desire?"
-              name="term"
+              name="search"
               id="search-box"
               onChange={onSearchChange}
             />
