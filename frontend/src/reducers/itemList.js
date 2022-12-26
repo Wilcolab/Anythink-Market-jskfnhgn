@@ -1,4 +1,3 @@
-import { bindActionCreators } from "redux";
 import {
   ITEM_FAVORITED,
   ITEM_UNFAVORITED,
