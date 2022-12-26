@@ -4,10 +4,13 @@ import agent from "../../agent";
 
 const Banner = (props) => {
   const onSearchChange = (event) => {
-    props.onSearchFilter(event.target.value, (page) => {
-      agent.Items.byTitle(event.target.value);
-      agent.Items.byTitle(event.target.value);
-    });
+    props.onSearchFilter(
+      event.target.value,
+      (page) => (
+        agent.Items.byTitle(event.target.value),
+        agent.Items.byTitle(event.target.value)
+      )
+    );
   };
   return (
     <div className="banner text-white">
@@ -21,7 +24,7 @@ const Banner = (props) => {
               style={{ width: "250px" }}
               type="text"
               placeholder="What is it that you truly desire?"
-              name="search"
+              name="term"
               id="search-box"
               onChange={onSearchChange}
             />
